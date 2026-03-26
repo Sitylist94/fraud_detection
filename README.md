@@ -1,61 +1,103 @@
-# fraud_detection
+# 🔍 Fraud Detection — Détection de fraude CB
 
-<a target="_blank" href="https://cookiecutter-data-science.drivendata.org/">
-    <img src="https://img.shields.io/badge/CCDS-Project%20template-328F97?logo=cookiecutter" />
-</a>
+Modèle de machine learning pour la détection de fraudes sur transactions par carte bancaire, basé sur **LightGBM** avec un pipeline sklearn complet.
 
-Détection de fraude CB
+---
 
-## Project Organization
+## 📊 Résultats
+
+| Métrique | Score |
+|---|---|
+| CV ROC-AUC | **0.966** |
+| Recall (fraude) | 0.84 |
+| Precision (fraude) | 0.13 |
+
+> Le dataset est fortement déséquilibré (~0.58% de fraudes). Le modèle utilise `class_weight="balanced"` pour compenser.
+
+---
+
+## 🗂️ Structure du projet
 
 ```
-├── LICENSE            <- Open-source license if one is chosen
-├── Makefile           <- Makefile with convenience commands like `make data` or `make train`
-├── README.md          <- The top-level README for developers using this project.
-├── data
-│   ├── external       <- Data from third party sources.
-│   ├── interim        <- Intermediate data that has been transformed.
-│   ├── processed      <- The final, canonical data sets for modeling.
-│   └── raw            <- The original, immutable data dump.
+fraud_detection/
+├── data/
+│   ├── raw/               ← Données brutes (non versionnées)
+│   ├── interim/           ← Données intermédiaires
+│   └── processed/         ← Données finales pour le modèle
 │
-├── docs               <- A default mkdocs project; see www.mkdocs.org for details
+├── fraud_detection/
+│   ├── config.py          ← Chemins et variables de configuration
+│   ├── dataset.py         ← Chargement et split des données
+│   ├── features.py        ← Preprocessing (ColumnTransformer)
+│   └── modeling/
+│       ├── train.py       ← Entraînement + cross-validation
+│       └── predict.py     ← Évaluation + seuil optimal
 │
-├── models             <- Trained and serialized models, model predictions, or model summaries
-│
-├── notebooks          <- Jupyter notebooks. Naming convention is a number (for ordering),
-│                         the creator's initials, and a short `-` delimited description, e.g.
-│                         `1.0-jqp-initial-data-exploration`.
-│
-├── pyproject.toml     <- Project configuration file with package metadata for 
-│                         fraud_detection and configuration for tools like black
-│
-├── references         <- Data dictionaries, manuals, and all other explanatory materials.
-│
-├── reports            <- Generated analysis as HTML, PDF, LaTeX, etc.
-│   └── figures        <- Generated graphics and figures to be used in reporting
-│
-├── requirements.txt   <- The requirements file for reproducing the analysis environment, e.g.
-│                         generated with `pip freeze > requirements.txt`
-│
-├── setup.cfg          <- Configuration file for flake8
-│
-└── fraud_detection   <- Source code for use in this project.
-    │
-    ├── __init__.py             <- Makes fraud_detection a Python module
-    │
-    ├── config.py               <- Store useful variables and configuration
-    │
-    ├── dataset.py              <- Scripts to download or generate data
-    │
-    ├── features.py             <- Code to create features for modeling
-    │
-    ├── modeling                
-    │   ├── __init__.py 
-    │   ├── predict.py          <- Code to run model inference with trained models          
-    │   └── train.py            <- Code to train models
-    │
-    └── plots.py                <- Code to create visualizations
+├── models/                ← Modèles sérialisés
+├── notebooks/             ← Exploration et expérimentations
+├── reports/figures/       ← Graphiques et visualisations
+├── main.py                ← Point d'entrée principal
+└── requirements.txt
 ```
 
---------
+---
 
+## ⚙️ Installation
+
+```bash
+# Cloner le repo
+git clone https://github.com/Sitylist94/fraud_detection.git
+cd fraud_detection
+
+# Créer et activer un environnement virtuel
+python -m venv venv
+venv\Scripts\activate        # Windows
+# source venv/bin/activate   # Linux / macOS
+
+# Installer les dépendances
+pip install -r requirements.txt
+```
+
+---
+
+## 🚀 Utilisation
+
+Placer les fichiers `train.csv` et `test.csv` dans `data/raw/`, puis :
+
+```bash
+python main.py
+```
+
+---
+
+## 🛠️ Pipeline
+
+```
+CSV brut
+  └─► ColumnTransformer
+        ├─ StandardScaler      (colonnes numériques)
+        └─ OneHotEncoder       (colonnes catégorielles)
+              └─► LGBMClassifier (class_weight="balanced")
+                    └─► Seuil optimal (courbe Precision-Recall)
+                          └─► Prédictions
+```
+
+---
+
+## 📦 Stack technique
+
+- **Python 3.11**
+- **LightGBM** — modèle de gradient boosting
+- **scikit-learn** — pipeline, preprocessing, métriques
+- **pandas / numpy** — manipulation des données
+- **loguru** — logging
+
+---
+
+## 📁 Données
+
+Les fichiers de données ne sont pas versionnés (voir `.gitignore`). Le dataset contient :
+
+- **Train** : 1 296 675 transactions (dont ~7 500 fraudes)
+- **Test** : 555 719 transactions
+- **Target** : `is_fraud` (0 = légitime, 1 = fraude)
