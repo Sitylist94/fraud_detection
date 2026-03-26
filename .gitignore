@@ -1,5 +1,9 @@
 # Data
-/data/
+data/raw/*.csv
+data/raw/*.parquet
+
+!data/**/gitignore
+!data/**/*.dvc
 
 # Mac OS-specific storage files
 .DS_Store
